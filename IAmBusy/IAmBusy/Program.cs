@@ -15,16 +15,17 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 
 builder.Services.AddMainApiService();
+
 // Ìí¼Ó NSwag ·þÎñ
+builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument(configure =>
 {
     configure.Title = "Main API";
 });
 
-//builder.Services.AddHttpClient<MainApiClient>("http://localhost:5090");
 builder.Services.AddHttpClient<MainApiClient>(client =>
 {
-    client.BaseAddress = new("https://localhost:7186");
+    client.BaseAddress = new("http://localhost:5090");
     client.Timeout = TimeSpan.FromSeconds(60);
 });
 
@@ -72,7 +73,7 @@ else
 
 app.UseCors("AllowBlazorClient");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseOpenApi();
 app.UseSwaggerUi();

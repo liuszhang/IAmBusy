@@ -8,7 +8,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddMudServices();
 builder.Services.AddHttpClient<MainApiClient>(client =>
 {
-    client.BaseAddress = new("https://localhost:7186");
+    client.BaseAddress = new("http://localhost:5090");
     client.Timeout = TimeSpan.FromSeconds(60);
 });
 
