@@ -14,5 +14,6 @@
 基本使用：
 - 下载后使用VS 2022打开
 - 编译运行IAmBusy项目，打开http://localhost:5090
+- 或者直接下载打包好的publish包，双击IAmBusy.exe（linux下 dotnet IAmBusy.dll）运行
 
-该项目非常适合作为.net体系练手和入门项目。
+该项目是我们开发小团队自用的看板项目，非常适合作为.net体系练手和入门项目。
