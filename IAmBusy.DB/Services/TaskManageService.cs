@@ -50,15 +50,5 @@ public class TaskManageService : ITaskManageService
             return null;
         }
     }
-
-    public Task<UserTask?> GetPdzById(string PDZId, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<UserTask?> UpdatePDZ(UserTask PDZ, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 }
 

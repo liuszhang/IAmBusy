@@ -89,27 +89,6 @@ public class UserService : IUserService
         return user;
     }
 
-    // 生成JWT令牌
-    //private string GenerateJwtToken(User user)
-    //{
-    //    var securityKey = _config["Jwt:SecurityKey"];
-    //    var issuer = _config["Jwt:Issuer"];
-    //    var audience = _config["Jwt:Audience"];
-
-    //    var tokenHandler = new JwtSecurityTokenHandler();
-    //    var key = Encoding.ASCII.GetBytes(securityKey);
-    //    var tokenDescriptor = new SecurityTokenDescriptor
-    //    {
-    //        Subject = new ClaimsIdentity(claims: GetClaims(user)),
-    //        Expires = DateTime.UtcNow.AddDays(7),
-    //        Issuer = issuer,
-    //        Audience = audience,
-    //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-    //    };
-
-    //    return tokenHandler.CreateToken(tokenDescriptor);
-    //}
-
     public async Task LogoutUserAsync(string userId)
     {
         await _signInManager.SignOutAsync();
@@ -125,6 +104,5 @@ public class UserService : IUserService
         return Task.FromResult(true); // 这里需要实现删除用户的逻辑
     }
 
-    // 其他方法（Logout、VerifyEmail等）实现类似逻辑...
 }
 

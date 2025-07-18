@@ -4,8 +4,6 @@ public interface ITaskManageService
 {
 
     Task<List<UserTask>?> GetAllTasks(CancellationToken cancellationToken = default);
-    Task<UserTask?> GetPdzById(string PDZId,CancellationToken cancellationToken = default);
     Task<UserTask?> CreateTask(UserTask Task, CancellationToken cancellationToken = default);
-    Task<UserTask?> UpdatePDZ(UserTask PDZ, CancellationToken cancellationToken = default);
     Task<bool> DeleteTask(int TaskId, CancellationToken cancellationToken = default);
 }

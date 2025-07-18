@@ -11,13 +11,8 @@ public static class TaskManageApi
         var api = app.MapGroup("api/task").WithTags("任务管理");
 
         api.MapGet("/getAllTasks", async (ITaskManageService service) => await service.GetAllTasks());
-        //api.MapGet("/getPDZById/{PDZId}", async (ITaskManageService service,string PDZId) => await service.GetPdzById(PDZId));
-        //api.MapPost("/getPdzByFilter", async (ITaskManageService service, [FromBody] PDZFilter filter) => await service.GetByFilter(filter));
         api.MapPost("/CreateTask", async (ITaskManageService service, [FromBody] UserTask Task) => await service.CreateTask(Task));
-        //api.MapPut("/updatePDZ", async (ITaskManageService service, [FromBody] PlugDataZone pdz) => await service.UpdatePDZ(pdz));
         api.MapDelete("/DeleteTask/{TaskId}", async (ITaskManageService service, int TaskId) => await service.DeleteTask(TaskId));
-        //api.MapPost("/deleteByFilter", async (ITaskManageService service, [FromBody] PDZFilter filter) => await service.DeleteByFilter(filter));
-
 
         return app;
     }

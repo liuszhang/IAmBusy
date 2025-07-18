@@ -36,13 +36,7 @@ public class DepartmentManageService : IDepartmentManageService
         }
 
     }
-    public async Task<Department?> GetByStationIpAsync(string stationIp, CancellationToken cancellationToken = default)
-    {
-        string decodedIp = Uri.UnescapeDataString(stationIp);
-        //MyCon1sole.WriteLine($"反转义后的IP为：{decodedIp}");
-        return await _dbContext.Departments
-            .FirstOrDefaultAsync(cancellationToken);
-    }
+
     public async Task<Department?> CreateDepartmentAsync(Department newDepartment, CancellationToken cancellationToken = default)
     {
         try
@@ -72,7 +66,6 @@ public class DepartmentManageService : IDepartmentManageService
     }
     public async Task<Department?> UpdateDepartmentAsync(Department updatedDepartment, CancellationToken cancellationToken = default)
     {
-        //await _context.Database.EnsureCreatedAsync(cancellationToken);
         var existingDepartment = await _dbContext.Departments.FindAsync(new object[] { updatedDepartment.Id }, cancellationToken);
         if (existingDepartment == null)
         {
@@ -91,21 +84,6 @@ public class DepartmentManageService : IDepartmentManageService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return existingDepartment;
     }
-    public async Task<Department?> GetByDisplayNameAsync(string DepartmentDisplayName, CancellationToken cancellationToken = default)
-    {
-        var DepartmentName = DepartmentDisplayName.Split("(")[0];
-        var DepartmentVersion = DepartmentDisplayName.Split("(")[1].TrimEnd(')');
-        //try
-        //{
-        //    return await _dbContext.Departments
-        //        .Where(t => t.DepartmentName == DepartmentName).FirstOrDefaultAsync(t => t.DepartmentVersion == DepartmentVersion,cancellationToken);
-        //}
-        //catch (Exception ex)
-        //{
-        //    Log.Error(ex.ToString());
-        //    return null;
-        //}
-        return null;
-    }
+
 }
 
