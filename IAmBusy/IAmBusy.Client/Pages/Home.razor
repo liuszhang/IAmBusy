@@ -1,0 +1,145 @@
+﻿@page "/"
+@using IAmBusy.Client.Components
+@using IAmBusy.Model.ApiClient
+@using IAmBusy.Model.Models
+
+@inject IDialogService DialogService
+@inject MainApiClient MainApiClient
+
+<PageTitle>I Am Busy!</PageTitle>
+
+<MudStack Spacing="0">
+    <MudStack Row AlignItems="AlignItems.Center">
+        <MudSelect T="int" Label="部门" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="1">Option 1</MudSelectItem>
+            <MudSelectItem Value="2">Option 2</MudSelectItem>
+            <MudSelectItem Value="3">Option 3</MudSelectItem>
+        </MudSelect>
+        @* <MudSelect T="int" Label="岗位" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="1">Option 1</MudSelectItem>
+            <MudSelectItem Value="2">Option 2</MudSelectItem>
+            <MudSelectItem Value="3">Option 3</MudSelectItem>
+        </MudSelect> *@
+        <MudSelect T="int" Label="状态" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="1">空闲</MudSelectItem>
+            <MudSelectItem Value="2">Option 2</MudSelectItem>
+            <MudSelectItem Value="3">Option 3</MudSelectItem>
+        </MudSelect>
+        <MudTextField T="string" Label="姓名" Variant="Variant.Outlined" Margin="Margin.Dense" />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">重置</MudButton>
+    </MudStack>
+    <MudStack Row AlignItems="AlignItems.Center">
+        <MudTooltip Text="创建计划任务" Placement="Placement.Bottom">
+            <MudIconButton OnClick="CreateTask" Icon="@Icons.Material.Filled.Add" Color="Color.Tertiary" aria-label="add" />
+        </MudTooltip>
+        <MudSpacer />
+        <MudStack Row AlignItems="AlignItems.Center">
+            <MudDateRangePicker T="DateTime" Label="日期范围" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowLeft" Color="Color.Primary" Size="Size.Small" />
+            <MudButton Variant="Variant.Text">Today</MudButton>
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowRight" Color="Color.Primary" Size="Size.Small" />
+            <MudToggleGroup T="string" Outlined Delimiters Size="@Size.Small" Color="@Color.Primary" CheckMark FixedContent>
+                <MudToggleItem Value="@("日")" />
+                <MudToggleItem Value="@("周")" />
+                <MudToggleItem Value="@("月")" />
+                <MudToggleItem Value="@("年")" />
+            </MudToggleGroup>
+        </MudStack>
+
+    </MudStack>
+    <MudDivider />
+    <MudDropContainer T="User" @ref="_container" Items="_items" ItemsSelector="@((item,dropzone) => item.Identifier==dropzone)">
+        <ChildContent>
+            <div class="d-flex flex-column flex-grow-1">
+                <MudListSubheader Class="mt-2 pb-2">用户总数：@_items.Count</MudListSubheader>
+                <MudDropZone T="User" Identifier="dropzone" Class="d-flex flex-wrap flex-grow-1 pa-2 rounded" AllowReorder="true">
+                    <MudStack></MudStack>
+                </MudDropZone>
+            </div>
+            
+        </ChildContent>
+        <ItemRenderer>
+
+            <MudTable ServerData="(state,cc)=>ServerReload(context,state,cc)" @ref="dataTable" Dense="true" Hover="true" Elevation="6" Height="100%;" Style="width:320px;margin:12px;">
+                <ToolBarContent>
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h6">@context</MudText>
+                        <MudText Typo="Typo.body2">@($"<部门1>")</MudText>
+                    </MudStack>
+                </ToolBarContent>
+                <ColGroup>
+                    <col style="max-width:100px"/>
+                    <col style="width: 120px;" />
+                    <col style="width: 60px;" />
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="name_field" T="string">任务</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="position_field" T="string">时间</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">状态</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate Context="context1">                    
+                    <MudTd>
+                        @if (context1.IsPrivate)
+                        {
+                            <MudChip T="string" Size="Size.Small" Label="true">私密任务</MudChip>
+                        }
+                        else
+                        {
+                            @context1.Name
+                        }
+                        
+                        </MudTd>
+                    <MudTd>@($"{context1.StartTime}-{context1.EndTime}")</MudTd>
+                    <MudTd><MudChip T="string" Size="Size.Small" Color="Color.Primary">@context1.Status</MudChip></MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>No matching records found</MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Loading...</MudText>
+                </LoadingContent>
+            </MudTable>
+
+
+        </ItemRenderer>
+    </MudDropContainer>
+</MudStack>
+
+
+@code{
+    MudTable<UserTask> dataTable;
+    private MudDropContainer<User> _container;
+
+    private List<User> _items { get; set; } = new List<User>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _items = await MainApiClient.GetAllUsers();
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task<TableData<UserTask>> ServerReload(User context, TableState state, CancellationToken token)
+    {
+        var pagedData = _items.Where(u => u.Id == context.Id).SelectMany(u => u.UserTasks).ToList();
+
+        // Return the data
+        return new TableData<UserTask>() { TotalItems = pagedData.Count, Items = pagedData };
+    }
+
+
+    private async Task CreateTask()
+    {
+        var dialog = await DialogService.ShowAsync<NewUserTaskDialog>("创建任务");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            _items = await MainApiClient.GetAllUsers();
+        }
+    }
+
+}

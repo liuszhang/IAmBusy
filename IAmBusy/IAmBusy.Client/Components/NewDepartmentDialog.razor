@@ -1,0 +1,35 @@
+﻿@using IAmBusy.Model.ApiClient
+@using IAmBusy.Model.Models
+@inject MainApiClient MainApiClient
+
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Create New Department</MudText>
+        <MudTextField @bind-Value="DepartmentName" Label="Department Name" Required="true" />
+        <MudTextField @bind-Value="DepartmentDescription" Label="Department Description"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit" Color="Color.Primary">Create</MudButton>
+        <MudButton OnClick="() => MudDialog.Cancel()" Color="Color.Secondary">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+
+
+    private string? DepartmentName { get; set; }
+    private string? DepartmentDescription { get; set; }
+
+    private async Task Submit()
+    {
+        var department = new Department
+            {
+                Name = DepartmentName,
+                Description = DepartmentDescription
+            };
+        var result = await MainApiClient.CreateNewDepartment(department);
+        MudDialog.Close(result);
+    }
+}

@@ -1,0 +1,51 @@
+﻿@using IAmBusy.Model.ApiClient
+@using IAmBusy.Model.Models
+@inject MainApiClient MainApiClient
+
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Create New User</MudText>
+        <MudTextField @bind-Value="UserName" Label="User Name" Required="true" />
+        <MudSelect T="Department" @bind-Value="Department">
+            @foreach(var department in Departments)
+            {
+                <MudSelectItem Value="@department">@department.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit" Color="Color.Primary">Create</MudButton>
+        <MudButton OnClick="() => MudDialog.Cancel()" Color="Color.Secondary">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+
+
+    private string? UserName { get; set; }
+    private List<Department>? Departments { get; set; } = new();
+    private Department? Department { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Departments = await MainApiClient.GetAllDepartments();
+    }
+
+    private async Task Submit()
+    {
+        var user = new User
+            {
+                UserName = UserName,
+                Password="123456",
+                Email = $"{UserName}@cj.com",
+                
+                DepartmentName = Department?.Name,
+                DepartmentId = Department?.Id
+            };
+        var result = await MainApiClient.CreateNewUser(user);
+        MudDialog.Close(result);
+    }
+}

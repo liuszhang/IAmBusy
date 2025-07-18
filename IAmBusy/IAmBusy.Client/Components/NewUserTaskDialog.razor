@@ -1,0 +1,59 @@
+﻿@using IAmBusy.Model.ApiClient
+@using IAmBusy.Model.Models
+@inject MainApiClient MainApiClient
+
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="TaskName" Label="任务名称" Required="true" />
+        <MudSelect T="User" @bind-Value="User" Label="责任人">
+            @foreach(var user in Users)
+            {
+                <MudSelectItem Value="@user">@user.UserName</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTimePicker @bind-Time="StartTime" Label="开始时间"></MudTimePicker>
+        <MudTimePicker @bind-Time="EndTime" Label="截至时间"></MudTimePicker>
+        <MudCheckBox T="bool" @bind-Value="IsPrivate" Label="是否私密任务"></MudCheckBox>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit" Color="Color.Primary">Create</MudButton>
+        <MudButton OnClick="() => MudDialog.Cancel()" Color="Color.Secondary">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+
+
+    private string? TaskName { get; set; }
+    private List<User>? Users { get; set; } = new();
+    private User? User { get; set; }
+    private TimeSpan? StartTime { get; set; }
+    private TimeSpan? EndTime { get; set; }
+    private bool IsPrivate { get; set; } = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await MainApiClient.GetAllUsers();
+    }
+
+    private async Task Submit()
+    {
+        var task = new UserTask
+            {
+                Name = TaskName,
+                UserId = User?.Id,
+                UserName=User?.UserName,
+                User=User,
+                StartTime=StartTime.ToString(),
+                EndTime=EndTime.ToString(),
+                Description = "This is a new task created from the dialog.",
+            IsPrivate = IsPrivate
+            };
+            
+        var result = await MainApiClient.CreateNewUserTask(task);
+        MudDialog.Close(result);
+    }
+}

@@ -1,0 +1,73 @@
+﻿@page "/user"
+@using IAmBusy.Client.Components
+@using IAmBusy.Model.ApiClient
+@using IAmBusy.Model.Models
+
+@inject MainApiClient MainApiClient
+@inject IDialogService DialogService
+
+
+<MudDataGrid T="User" AllowUnsorted="true" Items="@Users" Striped="true" Hover="true" Dense="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">用户管理</MudText>
+        <MudSpacer />
+        <MudButton OnClick="CreateUser" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">添加用户</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="u => u.Id" Title="ID" />
+        <PropertyColumn Property="u => u.UserName" Title="姓名" />
+        <PropertyColumn Property="u => u.Email" Title="邮箱" />
+        <PropertyColumn Property="u => u.DepartmentName" Title="部门" />
+        <TemplateColumn T="User" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton OnClick="()=>DeleteUser(context.Item)" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Error">Delete</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+</MudDataGrid>
+
+
+
+@code {
+    private List<User> Users { get; set; } = new();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadUsers();
+        }
+    }
+
+    private async Task LoadUsers()
+    {
+        Users = await MainApiClient.GetAllUsers();
+        // 确保在 UI 线程上调用 StateHasChanged()
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task CreateUser()
+    {
+        var dialog = await DialogService.ShowAsync<NewUserDialog>("创建部门");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            //await LoadDepartments();
+            Users.Add((User)result.Data);
+        }
+    }
+
+
+    private async Task DeleteUser(User user)
+    {
+        await MainApiClient.DeleteUser(user.Id);
+        //await LoadDepartments();
+        Users.Remove(user);
+    }
+
+}

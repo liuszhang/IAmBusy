@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+@inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
+
+
+
+@* Required *@
+<MudThemeProvider IsDarkMode="_isDarkMode"/>
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+
+<MudLayout>
+    <MudAppBar Dense>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <MudText>I Am Busy!</MudText>        
+        <MudSpacer />
+        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+
+        <MudButton EndIcon="@Icons.Material.Outlined.Logout" Color="Color.Inherit" @onclick="@Logout">欢迎：@userName</MudButton>
+
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always">
+        <NavMenu/>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+@code {
+    bool _drawerOpen = false;
+    private bool _isDarkMode = false;
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? userName { get; set; } = "Admin";
+
+    public string DarkLightModeButtonIcon => _isDarkMode switch
+    {
+        true => Icons.Material.Rounded.AutoMode,
+        false => Icons.Material.Outlined.DarkMode,
+    };
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private void DarkModeToggle()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    private void Logout()
+    {
+        AuthenticationState = null;
+        NavigationManager.NavigateTo("/");
+    }
+}

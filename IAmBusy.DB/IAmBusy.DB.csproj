@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" />
+
+    <PackageReference Include="NSwag.AspNetCore" />
+
+    <PackageReference Include="System.Linq" />
+
+    <PackageReference Include="System.Linq.Async" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IAmBusy.Model\IAmBusy.Model.csproj" />
+  </ItemGroup>
+
+</Project>
